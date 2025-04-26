@@ -3,6 +3,101 @@ Starter repository for the film and tv challenge based on a fictitious startup a
 
 # StreamStack
 
+A community-driven platform for reviewing and rating Netflix shows and films.
+
+## Features
+
+- Browse Netflix titles with detailed information
+- Filter titles by director and rating
+- Sort titles by release year or title
+- Search titles by name or keyword
+- View detailed information about each title
+- Leave ratings and written reviews
+- View average ratings and all reviews for each title
+
+## Tech Stack
+
+- Frontend: React with Material-UI
+- Backend: Node.js with Express
+- Database: SQLite
+
+## Prerequisites
+
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+
+## Setup
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/streamstack.git
+cd streamstack
+```
+
+2. Install backend dependencies:
+```bash
+npm install
+```
+
+3. Install frontend dependencies:
+```bash
+cd client
+npm install
+```
+
+## Running the Application
+
+1. Start the backend server:
+```bash
+# From the root directory
+npm run dev
+```
+
+2. Start the frontend development server:
+```bash
+# From the client directory
+cd client
+npm start
+```
+
+The application will be available at:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:3001
+
+## API Endpoints
+
+### Titles
+- `GET /api/titles` - Get all titles
+- `GET /api/titles/:id` - Get title details by ID
+
+### Reviews
+- `GET /api/reviews/:show_id` - Get reviews for a title
+- `GET /api/reviews/:show_id/average` - Get average rating for a title
+- `POST /api/reviews` - Add a new review
+
+## Development
+
+The project structure is organized as follows:
+
+```
+streamstack/
+├── client/                 # React frontend
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   └── App.js        # Main application component
+├── server.js              # Express backend server
+├── netflix.sqlite         # SQLite database
+└── package.json          # Backend dependencies
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
 ## Context
 StreamStack is a new startup aiming to build a **community-driven platform** where users can review and rate Netflix shows and films.
 
