@@ -169,7 +169,7 @@ function TitleDetail() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
             <img
-              src={`https://source.unsplash.com/random/400x600?${title.title}`}
+              src={`https://placehold.co/600x400?${title.title}`}
               alt={title.title}
               style={{ width: '100%', borderRadius: '8px' }}
             />

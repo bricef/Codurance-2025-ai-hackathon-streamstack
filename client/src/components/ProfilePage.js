@@ -20,6 +20,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import EditReviewDialog from './EditReviewDialog';
+import FilmList from './FilmList';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -102,7 +103,7 @@ const ProfilePage = () => {
   };
 
   const handleTitleClick = (showId) => {
-    navigate(`/titles/${showId}`);
+    navigate(`/title/${showId}`);
   };
 
   const handleEditReview = (reviewId) => {
@@ -152,157 +153,53 @@ const ProfilePage = () => {
   }
 
   const renderRecommendations = () => (
-    <Grid container spacing={3}>
-      {recommendations.map((title) => (
-        <Grid item xs={12} sm={6} md={4} key={title.show_id}>
-          <Card 
-            sx={{ 
-              height: '100%', 
-              display: 'flex', 
-              flexDirection: 'column',
-              transition: 'transform 0.2s',
-              '&:hover': {
-                transform: 'scale(1.02)',
-                cursor: 'pointer'
-              }
-            }}
-            onClick={() => handleTitleClick(title.show_id)}
-          >
-            <CardMedia
-              component="img"
-              height="200"
-              image={`https://source.unsplash.com/featured/?${encodeURIComponent(title.title)}`}
-              alt={title.title}
-            />
-            <CardContent sx={{ flexGrow: 1 }}>
-              <Typography gutterBottom variant="h6" component="h2">
-                {title.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                {title.type} • {title.release_year}
-              </Typography>
-              <Box sx={{ mt: 1, mb: 1 }}>
-                {title.listed_in.split(', ').map((genre) => (
-                  <Chip 
-                    key={genre} 
-                    label={genre} 
-                    size="small" 
-                    sx={{ mr: 0.5, mb: 0.5 }}
-                  />
-                ))}
-              </Box>
-              <Typography variant="body2" color="text.secondary" noWrap>
-                {title.description}
-              </Typography>
-            </CardContent>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Rating 
-                  value={title.avg_rating || 0} 
-                  precision={0.5} 
-                  readOnly 
-                  size="small"
-                />
-                <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                  {title.avg_rating ? title.avg_rating.toFixed(1) : 'No ratings'}
-                </Typography>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
+    <FilmList 
+      films={recommendations}
+      onTitleClick={handleTitleClick}
+      imageHeight={300}
+    />
   );
 
   const renderFavorites = () => (
-    <Grid container spacing={3}>
-      {favorites.map((title) => (
-        <Grid item xs={12} sm={6} md={4} key={title.show_id}>
-          <Card 
-            sx={{ 
-              height: '100%', 
-              display: 'flex', 
-              flexDirection: 'column',
-              transition: 'transform 0.2s',
-              '&:hover': {
-                transform: 'scale(1.02)',
-                cursor: 'pointer'
-              }
-            }}
-          >
-            <CardMedia
-              component="img"
-              height="200"
-              image={`https://source.unsplash.com/featured/?${encodeURIComponent(title.title)}`}
-              alt={title.title}
-              onClick={() => handleTitleClick(title.show_id)}
-            />
-            <CardContent sx={{ flexGrow: 1 }} onClick={() => handleTitleClick(title.show_id)}>
-              <Typography gutterBottom variant="h6" component="h2">
-                {title.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                {title.type} • {title.release_year}
-              </Typography>
-              <Box sx={{ mt: 1, mb: 1 }}>
-                {title.listed_in.split(', ').map((genre) => (
-                  <Chip 
-                    key={genre} 
-                    label={genre} 
-                    size="small" 
-                    sx={{ mr: 0.5, mb: 0.5 }}
-                  />
-                ))}
-              </Box>
-              <Typography variant="body2" color="text.secondary" noWrap>
-                {title.description}
-              </Typography>
-            </CardContent>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Rating 
-                    value={title.avg_rating || 0} 
-                    precision={0.5} 
-                    readOnly 
-                    size="small"
-                  />
-                  <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                    {title.avg_rating ? title.avg_rating.toFixed(1) : 'No ratings'}
-                  </Typography>
-                </Box>
-                <IconButton 
-                  color="error" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveFavorite(title.show_id);
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
+    <FilmList 
+      films={favorites}
+      onTitleClick={handleTitleClick}
+      onRemoveFavorite={handleRemoveFavorite}
+      showRemoveButton={true}
+      imageHeight={300}
+    />
   );
 
   const renderReviews = () => (
     <Grid container spacing={3}>
       {reviews.map((review) => (
         <Grid item xs={12} key={review.id}>
-          <Card>
+          <Card 
+            sx={{ 
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              '&:hover': {
+                boxShadow: 6
+              }
+            }}
+          >
             <CardContent>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={3}>
                   <CardMedia
                     component="img"
-                    height="200"
-                    image={`https://source.unsplash.com/featured/?${encodeURIComponent(review.title)}`}
+                    height="300"
+                    image={`https://placehold.co/200x300?${encodeURIComponent(review.title)}`}
                     alt={review.title}
                     onClick={() => handleTitleClick(review.show_id)}
-                    sx={{ cursor: 'pointer' }}
+                    sx={{ 
+                      cursor: 'pointer',
+                      objectFit: 'cover',
+                      aspectRatio: '2/3',
+                      transition: 'transform 0.2s',
+                      '&:hover': {
+                        transform: 'scale(1.05)'
+                      }
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={9}>
@@ -311,33 +208,77 @@ const ProfilePage = () => {
                     component="h2" 
                     gutterBottom
                     onClick={() => handleTitleClick(review.show_id)}
-                    sx={{ cursor: 'pointer' }}
+                    sx={{ 
+                      cursor: 'pointer',
+                      '&:hover': {
+                        color: 'primary.main'
+                      }
+                    }}
                   >
                     {review.title}
                   </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      mb: 2,
+                      gap: 1
+                    }}
+                  >
                     <Rating value={review.rating} readOnly size="small" />
-                    <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                    <Typography variant="body2" color="text.secondary">
                       {review.rating} stars
                     </Typography>
+                    <Typography 
+                      variant="caption" 
+                      color="text.secondary"
+                      sx={{ ml: 'auto' }}
+                    >
+                      Reviewed on {new Date(review.created_at).toLocaleDateString()}
+                    </Typography>
                   </Box>
-                  <Typography variant="body1" paragraph>
+                  <Typography 
+                    variant="body1" 
+                    paragraph
+                    sx={{
+                      whiteSpace: 'pre-wrap',
+                      lineHeight: 1.6
+                    }}
+                  >
                     {review.review}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Reviewed on {new Date(review.created_at).toLocaleDateString()}
-                  </Typography>
-                  <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      justifyContent: 'flex-end',
+                      gap: 1,
+                      mt: 2,
+                      pt: 2,
+                      borderTop: '1px solid',
+                      borderColor: 'divider'
+                    }}
+                  >
                     <IconButton 
                       color="primary" 
                       onClick={() => handleEditReview(review.id)}
-                      sx={{ mr: 1 }}
+                      sx={{
+                        transition: 'transform 0.2s',
+                        '&:hover': {
+                          transform: 'scale(1.1)'
+                        }
+                      }}
                     >
                       <EditIcon />
                     </IconButton>
                     <IconButton 
                       color="error" 
                       onClick={() => handleDeleteReview(review.id)}
+                      sx={{
+                        transition: 'transform 0.2s',
+                        '&:hover': {
+                          transform: 'scale(1.1)'
+                        }
+                      }}
                     >
                       <DeleteIcon />
                     </IconButton>

@@ -128,6 +128,7 @@ function TitleList() {
             <Card
               sx={{
                 height: '100%',
+                width: '250px',
                 display: 'flex',
                 flexDirection: 'column',
                 cursor: 'pointer',
@@ -141,7 +142,7 @@ function TitleList() {
               <CardMedia
                 component="img"
                 height="140"
-                image={`https://source.unsplash.com/random/300x200?${title.title}`}
+                image={`https://placehold.co/300x200?${title.title}`}
                 alt={title.title}
               />
               <CardContent sx={{ flexGrow: 1 }}>
