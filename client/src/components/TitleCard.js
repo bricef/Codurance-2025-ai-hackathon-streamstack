@@ -25,17 +25,22 @@ const TitleCard = ({
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const searchFunction = title.type === 'Movie' ? searchMovie : searchTVShow;
-        const result = await searchFunction(title.title, title.release_year);
+        // Handle both title and review objects
+        const titleName = title.title || title.show_title;
+        const type = title.type || title.show_type;
+
+        const searchFunction = type === 'Movie' ? searchMovie : searchTVShow;
+        const result = await searchFunction(titleName);
         
         if (result && result.poster_path) {
           setImageUrl(getPosterUrl(result.poster_path));
         } else {
-          setImageUrl(`https://placehold.co/600x400/333/fff?text=${encodeURIComponent(title.title)}`);
+          console.warn(`No TMDb image found for ${titleName}`);
+          setImageUrl(`https://placehold.co/600x400/333/fff?text=${encodeURIComponent(titleName)}`);
         }
       } catch (error) {
-        console.error(`Error fetching image for ${title.title}:`, error);
-        setImageUrl(`https://placehold.co/600x400/333/fff?text=${encodeURIComponent(title.title)}`);
+        console.error(`Error fetching image for ${title.title || title.show_title}:`, error);
+        setImageUrl(`https://placehold.co/600x400/333/fff?text=${encodeURIComponent(title.title || title.show_title || 'Unknown')}`);
       } finally {
         setLoading(false);
       }
@@ -65,7 +70,7 @@ const TitleCard = ({
         component="img"
         height={imageHeight}
         image={imageUrl}
-        alt={title.title}
+        alt={title.title || title.show_title}
         onClick={() => onTitleClick(title.show_id)}
         sx={{
           objectFit: 'cover',
@@ -78,7 +83,7 @@ const TitleCard = ({
         }}
         onError={(e) => {
           e.target.onerror = null;
-          e.target.src = `https://placehold.co/600x400/333/fff?text=${encodeURIComponent(title.title)}`;
+          e.target.src = `https://placehold.co/600x400/333/fff?text=${encodeURIComponent(title.title || title.show_title || 'Unknown')}`;
         }}
       />
     );
@@ -127,7 +132,7 @@ const TitleCard = ({
             width: '100%'
           }}
         >
-          {title.title}
+          {title.title || title.show_title}
         </Typography>
         <Typography 
           variant="body2" 
@@ -135,9 +140,9 @@ const TitleCard = ({
           gutterBottom
           sx={{ mb: 1, fontSize: '0.875rem', width: '100%' }}
         >
-          {title.type} • {title.release_year}
+          {title.type || title.show_type} • {title.release_year || title.show_release_year}
         </Typography>
-        {showGenres && (
+        {showGenres && title.listed_in && (
           <Box 
             sx={{ 
               mt: 1, 
@@ -161,7 +166,7 @@ const TitleCard = ({
             ))}
           </Box>
         )}
-        {showDescription && (
+        {showDescription && title.description && (
           <Typography 
             variant="body2" 
             color="text.secondary"

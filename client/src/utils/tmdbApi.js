@@ -4,13 +4,12 @@ const TMDB_API_KEY = process.env.REACT_APP_TMDB_API_KEY;
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 const TMDB_IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
 
-export const searchMovie = async (title, year) => {
+export const searchMovie = async (title) => {
   try {
     const response = await axios.get(`${TMDB_BASE_URL}/search/movie`, {
       params: {
         api_key: TMDB_API_KEY,
         query: title,
-        year: year,
         language: 'en-US',
         include_adult: false
       }
@@ -26,13 +25,12 @@ export const searchMovie = async (title, year) => {
   }
 };
 
-export const searchTVShow = async (title, year) => {
+export const searchTVShow = async (title) => {
   try {
     const response = await axios.get(`${TMDB_BASE_URL}/search/tv`, {
       params: {
         api_key: TMDB_API_KEY,
         query: title,
-        first_air_date_year: year,
         language: 'en-US',
         include_adult: false
       }

@@ -13,7 +13,8 @@ import {
   CardMedia,
   Rating,
   Chip,
-  IconButton
+  IconButton,
+  Divider
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -21,6 +22,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import EditReviewDialog from './EditReviewDialog';
 import FilmList from './FilmList';
+import TitleCard from './TitleCard';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -185,21 +187,13 @@ const ProfilePage = () => {
             <CardContent>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={3}>
-                  <CardMedia
-                    component="img"
-                    height="300"
-                    image={`https://placehold.co/200x300?${encodeURIComponent(review.title)}`}
-                    alt={review.title}
-                    onClick={() => handleTitleClick(review.show_id)}
-                    sx={{ 
-                      cursor: 'pointer',
-                      objectFit: 'cover',
-                      aspectRatio: '2/3',
-                      transition: 'transform 0.2s',
-                      '&:hover': {
-                        transform: 'scale(1.05)'
-                      }
-                    }}
+                  <TitleCard
+                    title={review}
+                    onTitleClick={() => handleTitleClick(review.show_id)}
+                    imageHeight={300}
+                    showDescription={false}
+                    showGenres={false}
+                    showRating={false}
                   />
                 </Grid>
                 <Grid item xs={12} sm={9}>
