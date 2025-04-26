@@ -133,6 +133,20 @@ app.post('/api/auth/login', async (req, res) => {
   });
 });
 
+app.get('/api/auth/me', authenticateToken, (req, res) => {
+  const user_id = req.user.id;
+  
+  db.get('SELECT id, username, email FROM users WHERE id = ?', [user_id], (err, user) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  });
+});
+
 // Favorites routes
 app.post('/api/favorites', authenticateToken, (req, res) => {
   const { show_id } = req.body;
@@ -248,6 +262,49 @@ app.get('/api/reviews/:show_id/average', (req, res) => {
   });
 });
 
+app.delete('/api/reviews/:id', authenticateToken, (req, res) => {
+  const { id } = req.params;
+  const user_id = req.user.id;
+  
+  db.run(
+    'DELETE FROM reviews WHERE id = ? AND user_id = ?',
+    [id, user_id],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ error: 'Review not found or unauthorized' });
+      }
+      res.json({ message: 'Review deleted successfully' });
+    }
+  );
+});
+
+app.put('/api/reviews/:id', authenticateToken, (req, res) => {
+  const { id } = req.params;
+  const user_id = req.user.id;
+  const { rating, review } = req.body;
+  
+  if (!rating || !review) {
+    return res.status(400).json({ error: 'Rating and review are required' });
+  }
+  
+  db.run(
+    'UPDATE reviews SET rating = ?, review = ? WHERE id = ? AND user_id = ?',
+    [rating, review, id, user_id],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ error: 'Review not found or unauthorized' });
+      }
+      res.json({ message: 'Review updated successfully' });
+    }
+  );
+});
+
 // Title routes
 app.get('/api/titles', (req, res) => {
   const { search, director, rating, sortBy, sortOrder, page = 1, limit = 20 } = req.query;
@@ -333,6 +390,64 @@ app.get('/api/titles/:id', (req, res) => {
       return;
     }
     res.json(row);
+  });
+});
+
+// Recommendation routes
+app.get('/api/recommendations', authenticateToken, (req, res) => {
+  const user_id = req.user.id;
+  
+  // Get user's favorite genres and highly rated movies
+  db.all(`
+    WITH user_preferences AS (
+      -- Get genres from user's favorites
+      SELECT DISTINCT trim(value) as genre
+      FROM netflix n
+      INNER JOIN favorites f ON n.show_id = f.show_id
+      CROSS JOIN json_each('["' || replace(n.listed_in, ', ', '","') || '"]')
+      WHERE f.user_id = ?
+      
+      UNION
+      
+      -- Get genres from highly rated reviews (4+ stars)
+      SELECT DISTINCT trim(value) as genre
+      FROM netflix n
+      INNER JOIN reviews r ON n.show_id = r.show_id
+      CROSS JOIN json_each('["' || replace(n.listed_in, ', ', '","') || '"]')
+      WHERE r.user_id = ? AND r.rating >= 4
+    ),
+    recommended_titles AS (
+      -- Find titles that match user's preferred genres
+      SELECT 
+        n.*,
+        COUNT(DISTINCT up.genre) as matching_genres,
+        COALESCE(AVG(r.rating), 0) as avg_rating,
+        (
+          SELECT COUNT(*) 
+          FROM json_each('["' || replace(n.listed_in, ', ', '","') || '"]') as g
+          WHERE trim(g.value) IN (SELECT genre FROM user_preferences)
+        ) as genre_match_score
+      FROM netflix n
+      CROSS JOIN user_preferences up
+      LEFT JOIN reviews r ON n.show_id = r.show_id
+      WHERE n.show_id NOT IN (
+        -- Exclude titles the user has already reviewed
+        SELECT show_id FROM reviews WHERE user_id = ?
+        UNION
+        -- Exclude titles the user has already favorited
+        SELECT show_id FROM favorites WHERE user_id = ?
+      )
+      GROUP BY n.show_id
+      HAVING genre_match_score > 0
+      ORDER BY genre_match_score DESC, avg_rating DESC
+      LIMIT 10
+    )
+    SELECT * FROM recommended_titles
+  `, [user_id, user_id, user_id, user_id], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
   });
 });
 

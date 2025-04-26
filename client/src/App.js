@@ -7,7 +7,7 @@ import Navbar from './components/Navbar';
 import TitleList from './components/TitleList';
 import TitleDetail from './components/TitleDetail';
 import Login from './components/Login';
-import Profile from './components/Profile';
+import ProfilePage from './components/ProfilePage';
 
 const theme = createTheme({
   palette: {
@@ -67,7 +67,7 @@ function App() {
               <Route
                 path="/profile"
                 element={
-                  user ? <Profile user={user} /> : <Navigate to="/login" replace />
+                  user ? <ProfilePage user={user} /> : <Navigate to="/login" replace />
                 }
               />
             </Routes>
