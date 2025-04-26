@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Grid,
@@ -33,11 +33,7 @@ function TitleList() {
   });
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchTitles();
-  }, [page, searchQuery, directorFilter, ratingFilter, sortBy, sortOrder]);
-
-  const fetchTitles = async () => {
+  const fetchTitles = useCallback(async () => {
     try {
       const response = await axios.get('http://localhost:3001/api/titles', {
         params: {
@@ -55,7 +51,11 @@ function TitleList() {
     } catch (error) {
       console.error('Error fetching titles:', error);
     }
-  };
+  }, [page, searchQuery, directorFilter, ratingFilter, sortBy, sortOrder]);
+
+  useEffect(() => {
+    fetchTitles();
+  }, [fetchTitles]);
 
   const handleTitleClick = (id) => {
     navigate(`/title/${id}`);

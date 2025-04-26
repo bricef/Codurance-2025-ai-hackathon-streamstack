@@ -7,6 +7,10 @@ import {
   InputBase,
   IconButton,
   Box,
+  Button,
+  Menu,
+  MenuItem,
+  Avatar,
 } from '@mui/material';
 import { styled, alpha } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
@@ -51,15 +55,33 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-function Navbar({ onSearch }) {
+function Navbar({ user, onLogout }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (onSearch) {
-      onSearch(searchQuery);
-    }
+    // Implement search functionality
+  };
+
+  const handleMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleProfile = () => {
+    handleClose();
+    navigate('/profile');
+  };
+
+  const handleLogout = () => {
+    handleClose();
+    onLogout();
+    navigate('/');
   };
 
   return (
@@ -95,6 +117,44 @@ function Navbar({ onSearch }) {
             />
           </form>
         </Search>
+        {user ? (
+          <>
+            <IconButton
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleMenu}
+              color="inherit"
+            >
+              <Avatar sx={{ width: 32, height: 32 }}>
+                {user.username[0].toUpperCase()}
+              </Avatar>
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              <MenuItem onClick={handleProfile}>Profile</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            </Menu>
+          </>
+        ) : (
+          <Button color="inherit" onClick={() => navigate('/login')}>
+            Login
+          </Button>
+        )}
       </Toolbar>
     </AppBar>
   );

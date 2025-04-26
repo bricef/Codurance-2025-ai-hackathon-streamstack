@@ -160,3 +160,14 @@ To get started, StreamStack recommends using this open-source Netflix titles dat
 - **Local development** is sufficient — no deployment to an external environment is needed.
 - **Code quality is important** to StreamStack.  
   Your solution should be **well-designed** and **written in a test-driven manner**.
+
+
+
+## TODO
+
+- [ ] Login so reviews are not anonymous
+- [ ] IMDB images fro each movie
+- [ ] Tests
+- [ ] user can have a favourite list
+- [ ] User can see the movies they've reviewed
+- [ ] Recommendation engine - personalised based on favourites and review score
