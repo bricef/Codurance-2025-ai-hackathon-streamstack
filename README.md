@@ -169,5 +169,5 @@ To get started, StreamStack recommends using this open-source Netflix titles dat
 - [x] Tests
 - [x] user can have a favourite list
 - [x] User can see the movies they've reviewed
-- [ ] Recommendation engine - personalised based on favourites and review score
-- [ ] IMDB images fro each movie
+- [x] Recommendation engine - personalised based on favourites and review score
+- [ ] IMDB images for each movie

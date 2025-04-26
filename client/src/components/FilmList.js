@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Grid, 
   Card, 
@@ -8,9 +8,11 @@ import {
   Box,
   Rating,
   Chip,
-  IconButton
+  IconButton,
+  Skeleton
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { searchMovie, searchTVShow, getPosterUrl } from '../utils/tmdbApi';
 
 const FilmList = ({ 
   films, 
@@ -19,6 +21,91 @@ const FilmList = ({
   showRemoveButton = false,
   imageHeight = 200
 }) => {
+  const [imageUrls, setImageUrls] = useState({});
+  const [loadingImages, setLoadingImages] = useState({});
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      const newImageUrls = {};
+      const newLoadingImages = {};
+
+      // Initialize loading state for all films
+      films.forEach(film => {
+        newLoadingImages[film.show_id] = true;
+      });
+
+      // Fetch images in parallel for better performance
+      const imagePromises = films.map(async (film) => {
+        try {
+          const searchFunction = film.type === 'Movie' ? searchMovie : searchTVShow;
+          const result = await searchFunction(film.title, film.release_year);
+          
+          if (result && result.poster_path) {
+            newImageUrls[film.show_id] = getPosterUrl(result.poster_path);
+          } else {
+            // Fallback to a more descriptive placeholder
+            newImageUrls[film.show_id] = `https://placehold.co/600x400/333/fff?text=${encodeURIComponent(film.title)}`;
+          }
+        } catch (error) {
+          console.error(`Error fetching image for ${film.title}:`, error);
+          newImageUrls[film.show_id] = `https://placehold.co/600x400/333/fff?text=${encodeURIComponent(film.title)}`;
+        } finally {
+          newLoadingImages[film.show_id] = false;
+        }
+      });
+
+      // Wait for all image fetches to complete
+      await Promise.all(imagePromises);
+
+      setImageUrls(newImageUrls);
+      setLoadingImages(newLoadingImages);
+    };
+
+    if (films.length > 0) {
+      fetchImages();
+    }
+  }, [films]);
+
+  const renderImage = (title) => {
+    if (loadingImages[title.show_id]) {
+      return (
+        <Skeleton 
+          variant="rectangular" 
+          height={imageHeight} 
+          animation="wave"
+          sx={{ 
+            aspectRatio: '2/3',
+            width: '100%',
+            bgcolor: 'rgba(0, 0, 0, 0.1)'
+          }}
+        />
+      );
+    }
+
+    return (
+      <CardMedia
+        component="img"
+        height={imageHeight}
+        image={imageUrls[title.show_id]}
+        alt={title.title}
+        onClick={() => onTitleClick(title.show_id)}
+        sx={{
+          objectFit: 'cover',
+          aspectRatio: '2/3',
+          width: '100%',
+          transition: 'transform 0.2s',
+          '&:hover': {
+            transform: 'scale(1.05)'
+          }
+        }}
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = `https://placehold.co/600x400/333/fff?text=${encodeURIComponent(title.title)}`;
+        }}
+      />
+    );
+  };
+
   return (
     <Grid container spacing={3}>
       {films.map((title) => (
@@ -39,18 +126,7 @@ const FilmList = ({
               }
             }}
           >
-            <CardMedia
-              component="img"
-              height={imageHeight}
-              image={`https://placehold.co/600x400?${encodeURIComponent(title.title)}`}
-              alt={title.title}
-              onClick={() => onTitleClick(title.show_id)}
-              sx={{
-                objectFit: 'cover',
-                aspectRatio: '2/3',
-                width: '100%'
-              }}
-            />
+            {renderImage(title)}
             <CardContent 
               sx={{ 
                 flexGrow: 1, 

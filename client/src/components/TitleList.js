@@ -2,20 +2,16 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Grid,
-  Card,
-  CardContent,
-  CardMedia,
-  Typography,
   Box,
   TextField,
   MenuItem,
   Select,
   FormControl,
   InputLabel,
-  Chip,
   Pagination,
 } from '@mui/material';
 import axios from 'axios';
+import TitleCard from './TitleCard';
 
 function TitleList() {
   const [titles, setTitles] = useState([]);
@@ -125,47 +121,14 @@ function TitleList() {
       <Grid container spacing={3}>
         {titles.map((title) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={title.show_id}>
-            <Card
-              sx={{
-                height: '100%',
-                width: '250px',
-                display: 'flex',
-                flexDirection: 'column',
-                cursor: 'pointer',
-                '&:hover': {
-                  transform: 'scale(1.02)',
-                  transition: 'transform 0.2s ease-in-out',
-                },
-              }}
-              onClick={() => handleTitleClick(title.show_id)}
-            >
-              <CardMedia
-                component="img"
-                height="140"
-                image={`https://placehold.co/300x200?${title.title}`}
-                alt={title.title}
-              />
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Typography gutterBottom variant="h6" component="div">
-                  {title.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {title.type} • {title.release_year}
-                </Typography>
-                <Box sx={{ mt: 1 }}>
-                  <Chip
-                    label={title.rating}
-                    size="small"
-                    sx={{ mr: 1 }}
-                  />
-                  {title.director && (
-                    <Typography variant="body2" color="text.secondary">
-                      Director: {title.director}
-                    </Typography>
-                  )}
-                </Box>
-              </CardContent>
-            </Card>
+            <TitleCard
+              title={title}
+              onTitleClick={handleTitleClick}
+              imageHeight={300}
+              showDescription={true}
+              showGenres={true}
+              showRating={true}
+            />
           </Grid>
         ))}
       </Grid>
